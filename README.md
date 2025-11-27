@@ -5,7 +5,6 @@
 
 Анализатор веб-страниц, который проверяет сайты на SEO-пригодность.
 
-## Установка
+## Демо
 
-```bash
-make install
+Приложение развернуто на Render.com: https://python-project-83-4utz.onrender.com/
