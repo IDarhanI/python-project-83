@@ -15,7 +15,6 @@ build:
 render-start:
 	gunicorn -w 5 -b 0.0.0.0:$(PORT) page_analyzer:app
 
-# Команды для ruff - ВСЕГДА указываем путь
 lint:
 	uv run ruff check .
 
