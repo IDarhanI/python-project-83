@@ -123,16 +123,14 @@ def show_url(id):
             )
             checks = cur.fetchall()
 
-    return render_template(
-        "urls_show.html", url=url_data, checks=checks
-    )
+    return render_template("urls_show.html", url=url_data, checks=checks)
 
 
 @app.route("/urls/<int:id>/checks", methods=["POST"])
 def check_url(id):
     # На этом шаге просто создаем запись о проверке без реальной проверки
     created_at = datetime.now()
-    
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             # Проверяем, существует ли URL
