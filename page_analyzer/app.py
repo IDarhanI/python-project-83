@@ -79,9 +79,19 @@ def urls():
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT id, name, created_at
+                SELECT 
+                    urls.id, 
+                    urls.name,
+                    MAX(url_checks.created_at) as last_check_date,
+                    (SELECT status_code 
+                     FROM url_checks 
+                     WHERE url_id = urls.id 
+                     ORDER BY created_at DESC 
+                     LIMIT 1) as last_check_status
                 FROM urls
-                ORDER BY created_at DESC
+                LEFT JOIN url_checks ON urls.id = url_checks.url_id
+                GROUP BY urls.id, urls.name
+                ORDER BY urls.created_at DESC
             """
             )
             urls_list = cur.fetchall()
@@ -93,14 +103,58 @@ def urls():
 def show_url(id):
     with get_connection() as conn:
         with conn.cursor() as cur:
+            # Получаем информацию о сайте
             cur.execute("SELECT id, name, created_at FROM urls WHERE id = %s", (id,))
             url_data = cur.fetchone()
 
-    if not url_data:
-        flash("URL не найден", "danger")
-        return redirect(url_for("urls"))
+            if not url_data:
+                flash("URL не найден", "danger")
+                return redirect(url_for("urls"))
 
-    return render_template("urls_show.html", url=url_data)
+            # Получаем все проверки для этого сайта
+            cur.execute(
+                """
+                SELECT id, status_code, h1, title, description, created_at
+                FROM url_checks
+                WHERE url_id = %s
+                ORDER BY created_at DESC
+            """,
+                (id,),
+            )
+            checks = cur.fetchall()
+
+    return render_template(
+        "urls_show.html", url=url_data, checks=checks
+    )
+
+
+@app.route("/urls/<int:id>/checks", methods=["POST"])
+def check_url(id):
+    # На этом шаге просто создаем запись о проверке без реальной проверки
+    created_at = datetime.now()
+    
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            # Проверяем, существует ли URL
+            cur.execute("SELECT id FROM urls WHERE id = %s", (id,))
+            if not cur.fetchone():
+                flash("URL не найден", "danger")
+                return redirect(url_for("urls"))
+
+            # Временно создаем проверку без реальных данных
+            # В следующем шаге здесь будет реальная проверка сайта
+            cur.execute(
+                """
+                INSERT INTO url_checks 
+                (url_id, created_at) 
+                VALUES (%s, %s)
+                """,
+                (id, created_at),
+            )
+            conn.commit()
+            flash("Страница успешно проверена", "success")
+
+    return redirect(url_for("show_url", id=id))
 
 
 if __name__ == "__main__":
