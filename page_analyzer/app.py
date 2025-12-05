@@ -3,7 +3,8 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 import psycopg2
-import requests  # Добавляем импорт requests
+import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 
@@ -16,6 +17,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 def is_valid_url(url):
+    """Проверяет, является ли строка валидным URL."""
     if len(url) > 255:
         return False
     try:
@@ -26,21 +28,49 @@ def is_valid_url(url):
 
 
 def normalize_url(url):
+    """Нормализует URL, оставляя только схему и домен."""
     parsed = urlparse(url)
     return f"{parsed.scheme}://{parsed.netloc}"
 
 
 def get_connection():
+    """Создает соединение с базой данных."""
     return psycopg2.connect(DATABASE_URL)
+
+
+def parse_html(html_content):
+    """
+    Извлекает данные из HTML:
+    - h1 (первый тег h1 на странице)
+    - title (содержимое тега title)
+    - description (content атрибут meta тега с name="description")
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Извлекаем h1
+    h1_tag = soup.find("h1")
+    h1 = h1_tag.get_text().strip() if h1_tag else None
+
+    # Извлекаем title
+    title_tag = soup.find("title")
+    title = title_tag.get_text().strip() if title_tag else None
+
+    # Извлекаем description
+    meta_desc = soup.find("meta", attrs={"name": "description"})
+    description = meta_desc.get("content", "").strip() if meta_desc else None
+
+    return h1, title, description
 
 
 @app.route("/")
 def index():
+    """Главная страница с формой добавления URL."""
     return render_template("index.html")
 
 
 @app.route("/urls", methods=["POST"])
 def add_url():
+    """Добавление нового URL в базу данных."""
     url = request.form.get("url", "").strip()
 
     if not url:
@@ -55,6 +85,7 @@ def add_url():
 
     with get_connection() as conn:
         with conn.cursor() as cur:
+            # Проверяем, существует ли URL уже в базе
             cur.execute("SELECT id FROM urls WHERE name = %s", (normalized_url,))
             existing = cur.fetchone()
 
@@ -62,6 +93,7 @@ def add_url():
                 url_id = existing[0]
                 flash("Страница уже существует", "info")
             else:
+                # Создаем новую запись
                 created_at = datetime.now()
                 cur.execute(
                     "INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id",
@@ -76,6 +108,7 @@ def add_url():
 
 @app.route("/urls")
 def urls():
+    """Страница со списком всех добавленных URL."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -102,6 +135,7 @@ def urls():
 
 @app.route("/urls/<int:id>")
 def show_url(id):
+    """Страница с информацией о конкретном URL и его проверках."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             # Получаем информацию о сайте
@@ -129,6 +163,7 @@ def show_url(id):
 
 @app.route("/urls/<int:id>/checks", methods=["POST"])
 def check_url(id):
+    """Запуск проверки конкретного URL."""
     # Получаем URL сайта из базы
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -146,7 +181,14 @@ def check_url(id):
         response = requests.get(url_name, timeout=10)
         response.raise_for_status()  # Вызывает исключение для 4xx/5xx статусов
 
-        # Если запрос успешен, создаем запись о проверке
+        # Извлекаем данные из HTML
+        h1, title, description = parse_html(response.text)
+
+        # Если description слишком длинный, обрезаем его
+        if description and len(description) > 255:
+            description = description[:252] + "..."
+
+        # Создаем запись о проверке с извлеченными данными
         status_code = response.status_code
         created_at = datetime.now()
 
@@ -155,10 +197,10 @@ def check_url(id):
                 cur.execute(
                     """
                     INSERT INTO url_checks 
-                    (url_id, status_code, created_at) 
-                    VALUES (%s, %s, %s)
+                    (url_id, status_code, h1, title, description, created_at) 
+                    VALUES (%s, %s, %s, %s, %s, %s)
                     """,
-                    (id, status_code, created_at),
+                    (id, status_code, h1, title, description, created_at),
                 )
                 conn.commit()
                 flash("Страница успешно проверена", "success")
