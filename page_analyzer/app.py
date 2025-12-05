@@ -3,6 +3,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 import psycopg2
+import requests  # Добавляем импорт requests
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 
@@ -128,29 +129,43 @@ def show_url(id):
 
 @app.route("/urls/<int:id>/checks", methods=["POST"])
 def check_url(id):
-    # На этом шаге просто создаем запись о проверке без реальной проверки
-    created_at = datetime.now()
-
+    # Получаем URL сайта из базы
     with get_connection() as conn:
         with conn.cursor() as cur:
-            # Проверяем, существует ли URL
-            cur.execute("SELECT id FROM urls WHERE id = %s", (id,))
-            if not cur.fetchone():
+            cur.execute("SELECT name FROM urls WHERE id = %s", (id,))
+            url_result = cur.fetchone()
+
+            if not url_result:
                 flash("URL не найден", "danger")
                 return redirect(url_for("urls"))
 
-            # Временно создаем проверку без реальных данных
-            # В следующем шаге здесь будет реальная проверка сайта
-            cur.execute(
-                """
-                INSERT INTO url_checks 
-                (url_id, created_at) 
-                VALUES (%s, %s)
-                """,
-                (id, created_at),
-            )
-            conn.commit()
-            flash("Страница успешно проверена", "success")
+            url_name = url_result[0]
+
+    try:
+        # Выполняем запрос к сайту с таймаутом
+        response = requests.get(url_name, timeout=10)
+        response.raise_for_status()  # Вызывает исключение для 4xx/5xx статусов
+
+        # Если запрос успешен, создаем запись о проверке
+        status_code = response.status_code
+        created_at = datetime.now()
+
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO url_checks 
+                    (url_id, status_code, created_at) 
+                    VALUES (%s, %s, %s)
+                    """,
+                    (id, status_code, created_at),
+                )
+                conn.commit()
+                flash("Страница успешно проверена", "success")
+
+    except requests.exceptions.RequestException:
+        # Обработка всех исключений requests
+        flash("Произошла ошибка при проверке", "danger")
 
     return redirect(url_for("show_url", id=id))
 
