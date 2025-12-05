@@ -62,13 +62,13 @@ def parse_html(html_content):
     return h1, title, description
 
 
-@app.route("/")
+@app.get("/")
 def index():
     """Главная страница с формой добавления URL."""
     return render_template("index.html")
 
 
-@app.route("/urls", methods=["POST"])
+@app.post("/urls")
 def add_url():
     """Добавление нового URL в базу данных."""
     url = request.form.get("url", "").strip()
@@ -103,10 +103,10 @@ def add_url():
                 conn.commit()
                 flash("Страница успешно добавлена", "success")
 
-    return redirect(url_for("show_url", id=url_id))
+    return redirect(url_for("url_show", id=url_id))
 
 
-@app.route("/urls")
+@app.get("/urls")
 def urls():
     """Страница со списком всех добавленных URL."""
     with get_connection() as conn:
@@ -133,8 +133,8 @@ def urls():
     return render_template("urls_index.html", urls=urls_list)
 
 
-@app.route("/urls/<int:id>")
-def show_url(id):
+@app.get("/urls/<int:id>")
+def url_show(id):
     """Страница с информацией о конкретном URL и его проверках."""
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -161,8 +161,8 @@ def show_url(id):
     return render_template("urls_show.html", url=url_data, checks=checks)
 
 
-@app.route("/urls/<int:id>/checks", methods=["POST"])
-def check_url(id):
+@app.post("/urls/<int:id>/checks")
+def url_check(id):
     """Запуск проверки конкретного URL."""
     # Получаем URL сайта из базы
     with get_connection() as conn:
@@ -209,8 +209,4 @@ def check_url(id):
         # Обработка всех исключений requests
         flash("Произошла ошибка при проверке", "danger")
 
-    return redirect(url_for("show_url", id=id))
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    return redirect(url_for("url_show", id=id))
