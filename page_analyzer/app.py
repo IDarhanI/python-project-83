@@ -4,10 +4,10 @@ from urllib.parse import urlparse
 
 import psycopg2
 import requests
+import validators  # Добавляем для валидации URL
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
-import validators  # Добавляем для валидации URL
 
 load_dotenv()
 
@@ -24,11 +24,11 @@ def is_valid_url(url):
     """Проверяет, является ли строка валидным URL."""
     if len(url) > 255:
         return False
-    
+
     # Используем библиотеку validators для проверки
     if not validators.url(url):
         return False
-    
+
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
@@ -39,12 +39,12 @@ def is_valid_url(url):
 def normalize_url(url):
     """Нормализует URL, оставляя только схему и домен."""
     parsed = urlparse(url)
-    
+
     # Если нет схемы, добавляем https://
     if not parsed.scheme:
         url = "https://" + url
         parsed = urlparse(url)
-    
+
     return f"{parsed.scheme}://{parsed.netloc}"
 
 
@@ -120,7 +120,7 @@ def add_url():
                     flash("Страница успешно добавлена", "success")
 
         return redirect(url_for("url_show", id=url_id))
-        
+
     except Exception as e:
         flash(f"Ошибка при сохранении: {str(e)}", "danger")
         return render_template("index.html", url=url), 500
@@ -153,7 +153,7 @@ def urls():
                 urls_list = cur.fetchall()
 
         return render_template("urls_index.html", urls=urls_list)
-        
+
     except Exception as e:
         flash(f"Ошибка при загрузке данных: {str(e)}", "danger")
         return render_template("urls_index.html", urls=[])
@@ -186,7 +186,7 @@ def url_show(id):
                 checks = cur.fetchall()
 
         return render_template("urls_show.html", url=url_data, checks=checks)
-        
+
     except Exception as e:
         flash(f"Ошибка при загрузке данных: {str(e)}", "danger")
         return redirect(url_for("urls"))
@@ -209,10 +209,8 @@ def url_check(id):
                 url_name = url_result[0]
 
         # Выполняем запрос к сайту с таймаутом
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-        
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
         response = requests.get(url_name, headers=headers, timeout=10)
         response.raise_for_status()  # Вызывает исключение для 4xx/5xx статусов
 
@@ -244,7 +242,7 @@ def url_check(id):
         # Обработка всех исключений requests
         flash("Произошла ошибка при проверке", "danger")
         print(f"Request error: {e}")
-        
+
     except Exception as e:
         flash(f"Ошибка при проверке: {str(e)}", "danger")
         print(f"Other error: {e}")

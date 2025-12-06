@@ -12,12 +12,12 @@ dependencies = [
     "validators==0.22.0",
     "requests==2.31.0",
     "beautifulsoup4==4.12.2",
+    "ruff==0.1.9",  # ПЕРЕМЕЩАЕМ В ОСНОВНЫЕ ЗАВИСИМОСТИ
 ]
 
-# Убираем dev-зависимости из основного блока, переносим в optional
+# Убираем optional-dependencies или оставляем пустым
 [project.optional-dependencies]
 dev = [
-    "ruff==0.1.9",
     "pytest==7.4.3",
 ]
 
@@ -28,7 +28,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["page_analyzer"]
 
-# Настройки ruff выносим в отдельную секцию
 [tool.ruff]
 line-length = 127
 select = ["E", "F", "I", "C90"]

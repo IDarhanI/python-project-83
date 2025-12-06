@@ -21,7 +21,13 @@ lint:
 format:
 	uv run ruff format .
 
+format-check:
+	uv run ruff format --check .
+
+fix:  # ДОБАВЛЯЕМ ЭТУ КОМАНДУ
+	uv run ruff check --fix . && uv run ruff format .
+
 test:
 	uv run pytest tests/ -v
 
-.PHONY: install dev start render-start build lint format test
+.PHONY: install dev start render-start build lint format format-check fix test
