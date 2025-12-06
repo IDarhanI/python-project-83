@@ -93,7 +93,11 @@ def add_url():
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT id FROM urls WHERE name = %s", (normalized_url,))
+                # Исправлено: строка разбита
+                cur.execute(
+                    "SELECT id FROM urls WHERE name = %s",
+                    (normalized_url,),
+                )
                 existing = cur.fetchone()
 
                 if existing:
@@ -154,7 +158,11 @@ def url_show(id):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT id, name, created_at FROM urls WHERE id = %s", (id,))
+                # Исправлено: строка разбита
+                cur.execute(
+                    "SELECT id, name, created_at FROM urls WHERE id = %s",
+                    (id,),
+                )
                 url_data = cur.fetchone()
 
                 if not url_data:
@@ -194,7 +202,12 @@ def url_check(id):
 
                 url_name = url_result[0]
 
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        # Исправлено: строка разбита
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            )
+        }
 
         response = requests.get(url_name, headers=headers, timeout=10)
         response.raise_for_status()
