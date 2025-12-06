@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  UV_PROJECT_ENVIRONMENT: .venv
+  UV_PYTHON: "3.11"  # У вас в проекте 3.11
+
+jobs:
+  lint-and-format:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+    
+    - name: Install Python
+      run: uv python install ${{ env.UV_PYTHON }}
+    
+    - name: Sync dependencies
+      run: uv sync --frozen
+    
+    - name: Check code formatting
+      run: uv run ruff format --check .
+    
+    - name: Check code quality
+      run: uv run ruff check .
+    
+    - name: Install the package in development mode
+      run: uv pip install -e .
+
+  sonar-scan:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    needs: lint-and-format  # Запускаем после линтинга
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+    
+    - name: Install Python
+      run: uv python install ${{ env.UV_PYTHON }}
+    
+    - name: Sync dependencies
+      run: uv sync --frozen
+    
+    - name: Install the package in development mode
+      run: uv pip install -e .
+    
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v6
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=IDarhanI_python-project-83
+          -Dsonar.organization=idarhani
+          -Dsonar.sources=page_analyzer
+          -Dsonar.exclusions=**/__pycache__/**,**/*.pyc
+          -Dsonar.language=py
+          -Dsonar.python.version=3.11
+          -Dsonar.sourceEncoding=UTF-8
+          -Dsonar.host.url=https://sonarcloud.io
