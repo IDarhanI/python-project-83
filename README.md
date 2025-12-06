@@ -1,29 +1,25 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions)
-
 # 🔍 Page Analyzer
 
-[![Actions Status](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml)
+[![Hexlet tests](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml)
 [![CI](https://github.com/IDarhanI/python-project-83/actions/workflows/ci.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/ci.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
+[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
 
 Веб-приложение для анализа веб-страниц на SEO-пригодность. Проверяет доступность страниц, извлекает ключевые метаданные и отслеживает изменения.
 
 ## 🌐 Демо
 
-Приложение развернуто на Render: [https://vk.com/away.php?to=https%3A%2F%2Fpython-project-83-4utz.onrender.com&utf=1]
+Приложение развернуто на Render: [https://python-project-83-4utz.onrender.com/](https://python-project-83-4utz.onrender.com/)
 
 ## ✨ Возможности
 
-- **Валидация URL** - проверка корректности и уникальности URL-адресов
-- **Проверка доступности** - анализ HTTP статус-кодов ответов
-- **SEO-анализ** - извлечение ключевых метаданных:
+- **Валидация URL** – проверка корректности и уникальности URL-адресов
+- **Проверка доступности** – анализ HTTP статус-кодов ответов
+- **SEO-анализ** – извлечение ключевых метаданных:
   - Заголовок страницы (`<title>`)
   - Основной заголовок (`<h1>`)
   - Мета-описание (`<meta name="description">`)
-- **История проверок** - хранение и отображение результатов всех проверок
-- **Адаптивный интерфейс** - современный дизайн на Bootstrap 5
+- **История проверок** – хранение и отображение результатов всех проверок
+- **Адаптивный интерфейс** – современный дизайн на Bootstrap 5
 
 ## 🏗️ Архитектура
 
@@ -41,6 +37,7 @@
 - Python 3.9+
 - PostgreSQL 12+
 - Git
+- [uv](https://github.com/astral-sh/uv) (установится автоматически)
 
 ### Локальная установка
 
