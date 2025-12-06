@@ -1,10 +1,9 @@
 import os
-from datetime import datetime
 from urllib.parse import urlparse
 
 import psycopg2
 import requests
-import validators  # Добавляем для валидации URL
+import validators
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -12,7 +11,7 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")  # Добавили значение по умолчанию
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -25,7 +24,6 @@ def is_valid_url(url):
     if len(url) > 255:
         return False
 
-    # Используем библиотеку validators для проверки
     if not validators.url(url):
         return False
 
@@ -38,13 +36,13 @@ def is_valid_url(url):
 
 def normalize_url(url):
     """Нормализует URL, оставляя только схему и домен."""
-    parsed = urlparse(url)
+    if not url:
+        return None
 
-    # Если нет схемы, добавляем https://
-    if not parsed.scheme:
+    if not url.startswith(("http://", "https://")):
         url = "https://" + url
-        parsed = urlparse(url)
 
+    parsed = urlparse(url)
     return f"{parsed.scheme}://{parsed.netloc}"
 
 
@@ -55,22 +53,16 @@ def get_connection():
 
 def parse_html(html_content):
     """
-    Извлекает данные из HTML:
-    - h1 (первый тег h1 на странице)
-    - title (содержимое тега title)
-    - description (content атрибут meta тега с name="description")
+    Извлекает данные из HTML.
     """
     soup = BeautifulSoup(html_content, "html.parser")
 
-    # Извлекаем h1
     h1_tag = soup.find("h1")
     h1 = h1_tag.get_text().strip() if h1_tag else None
 
-    # Извлекаем title
     title_tag = soup.find("title")
     title = title_tag.get_text().strip() if title_tag else None
 
-    # Извлекаем description
     meta_desc = soup.find("meta", attrs={"name": "description"})
     description = meta_desc.get("content", "").strip() if meta_desc else None
 
@@ -101,7 +93,6 @@ def add_url():
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                # Проверяем, существует ли URL уже в базе
                 cur.execute("SELECT id FROM urls WHERE name = %s", (normalized_url,))
                 existing = cur.fetchone()
 
@@ -109,11 +100,9 @@ def add_url():
                     url_id = existing[0]
                     flash("Страница уже существует", "info")
                 else:
-                    # Создаем новую запись
-                    created_at = datetime.now()
                     cur.execute(
-                        "INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id",
-                        (normalized_url, created_at),
+                        "INSERT INTO urls (name) VALUES (%s) RETURNING id",
+                        (normalized_url,),
                     )
                     url_id = cur.fetchone()[0]
                     conn.commit()
@@ -165,7 +154,6 @@ def url_show(id):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                # Получаем информацию о сайте
                 cur.execute("SELECT id, name, created_at FROM urls WHERE id = %s", (id,))
                 url_data = cur.fetchone()
 
@@ -173,14 +161,13 @@ def url_show(id):
                     flash("URL не найден", "danger")
                     return redirect(url_for("urls"))
 
-                # Получаем все проверки для этого сайта
                 cur.execute(
                     """
                     SELECT id, status_code, h1, title, description, created_at
                     FROM url_checks
                     WHERE url_id = %s
                     ORDER BY created_at DESC
-                """,
+                    """,
                     (id,),
                 )
                 checks = cur.fetchall()
@@ -196,7 +183,6 @@ def url_show(id):
 def url_check(id):
     """Запуск проверки конкретного URL."""
     try:
-        # Получаем URL сайта из базы
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT name FROM urls WHERE id = %s", (id,))
@@ -208,43 +194,35 @@ def url_check(id):
 
                 url_name = url_result[0]
 
-        # Выполняем запрос к сайту с таймаутом
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
         response = requests.get(url_name, headers=headers, timeout=10)
-        response.raise_for_status()  # Вызывает исключение для 4xx/5xx статусов
+        response.raise_for_status()
 
-        # Извлекаем данные из HTML
         h1, title, description = parse_html(response.text)
 
-        # Если description слишком длинный, обрезаем его
         if description and len(description) > 255:
             description = description[:252] + "..."
 
-        # Создаем запись о проверке с извлеченными данными
         status_code = response.status_code
-        created_at = datetime.now()
 
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     """
                     INSERT INTO url_checks 
-                    (url_id, status_code, h1, title, description, created_at) 
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    (url_id, status_code, h1, title, description) 
+                    VALUES (%s, %s, %s, %s, %s)
                     """,
-                    (id, status_code, h1, title, description, created_at),
+                    (id, status_code, h1, title, description),
                 )
                 conn.commit()
                 flash("Страница успешно проверена", "success")
 
-    except requests.exceptions.RequestException as e:
-        # Обработка всех исключений requests
+    except requests.exceptions.RequestException:
         flash("Произошла ошибка при проверке", "danger")
-        print(f"Request error: {e}")
 
     except Exception as e:
         flash(f"Ошибка при проверке: {str(e)}", "danger")
-        print(f"Other error: {e}")
 
     return redirect(url_for("url_show", id=id))

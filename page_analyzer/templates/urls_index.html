@@ -50,17 +50,16 @@
             <tr>
               <td>{{ url[0] }}</td>
               <td>
-                <!-- ИСПРАВЛЕНО ЗДЕСЬ: show_url → url_show -->
                 <a href="{{ url_for('url_show', id=url[0]) }}">{{ url[1] }}</a>
               </td>
               <td>
-                {% if url[2] %}
-                  {{ url[2].strftime('%Y-%m-%d') }}
+                {% if url[3] %}
+                  {{ url[3].strftime('%Y-%m-%d') }}
                 {% endif %}
               </td>
               <td>
-                {% if url[3] %}
-                  {{ url[3] }}
+                {% if url[4] %}
+                  {{ url[4] }}
                 {% endif %}
               </td>
             </tr>

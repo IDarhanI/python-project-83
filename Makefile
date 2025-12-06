@@ -15,7 +15,7 @@ render-start:
 build:
 	./build.sh
 
-setup:  # ⬅️ ДОБАВИТЬ ЭТУ КОМАНДУ (для Hexlet тестов)
+setup:
 	uv sync
 
 lint:
