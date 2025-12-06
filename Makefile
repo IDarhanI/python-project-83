@@ -9,11 +9,11 @@ dev:
 start:
 	uv run gunicorn -w 5 -b 0.0.0.0:$(PORT) page_analyzer:app
 
-build:
-	./build.sh
-
 render-start:
 	gunicorn -w 5 -b 0.0.0.0:$(PORT) page_analyzer:app
+
+build:
+	./build.sh
 
 lint:
 	uv run ruff check .
@@ -21,11 +21,7 @@ lint:
 format:
 	uv run ruff format .
 
-format-check:
-	uv run ruff format --check .
+test:
+	uv run pytest tests/ -v
 
-fix:
-	uv run ruff check --fix . && uv run ruff format .
-
-lint-fix:
-	uv run ruff check --fix . && uv run ruff format .
+.PHONY: install dev start render-start build lint format test
