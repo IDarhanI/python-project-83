@@ -3,40 +3,60 @@
 
 # 🔍 Page Analyzer
 
-[![Tests](https://github.com/your-username/python-project-83/actions/workflows/test.yml/badge.svg)](https://github.com/your-username/python-project-83/actions/workflows/test.yml)
+[![Actions Status](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml)
+[![CI](https://github.com/IDarhanI/python-project-83/actions/workflows/ci.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
 
 Веб-приложение для анализа веб-страниц на SEO-пригодность. Проверяет доступность страниц, извлекает ключевые метаданные и отслеживает изменения.
 
 ## 🌐 Демо
 
-Приложение развернуто на Render: [https://your-app-name.onrender.com](https://your-app-name.onrender.com)
+Приложение развернуто на Render: [https://vk.com/away.php?to=https%3A%2F%2Fpython-project-83-4utz.onrender.com&utf=1]
 
 ## ✨ Возможности
 
-- ✅ Добавление и валидация URL
-- ✅ Проверка доступности страниц (HTTP статус коды)
-- ✅ Извлечение SEO-метаданных:
+- **Валидация URL** - проверка корректности и уникальности URL-адресов
+- **Проверка доступности** - анализ HTTP статус-кодов ответов
+- **SEO-анализ** - извлечение ключевых метаданных:
   - Заголовок страницы (`<title>`)
   - Основной заголовок (`<h1>`)
-  - Описание (`<meta name="description">`)
-- ✅ История проверок для каждого сайта
-- ✅ Адаптивный интерфейс на Bootstrap
+  - Мета-описание (`<meta name="description">`)
+- **История проверок** - хранение и отображение результатов всех проверок
+- **Адаптивный интерфейс** - современный дизайн на Bootstrap 5
 
-## 🚀 Быстрый старт
+## 🏗️ Архитектура
 
-### Установка
+- **Backend**: Flask (Python)
+- **База данных**: PostgreSQL
+- **Frontend**: Jinja2, Bootstrap 5
+- **Анализ HTML**: BeautifulSoup4
+- **Валидация**: validators, requests
+- **CI/CD**: GitHub Actions, SonarQube
+
+## 📦 Установка и запуск
+
+### Предварительные требования
+
+- Python 3.9+
+- PostgreSQL 12+
+- Git
+
+### Локальная установка
 
 ```bash
-# Клонировать репозиторий
-git clone https://github.com/your-username/python-project-83.git
+# 1. Клонировать репозиторий
+git clone https://github.com/IDarhanI/python-project-83.git
 cd python-project-83
 
-# Установить зависимости
+# 2. Установить зависимости
 make install
 
-# Создать базу данных
+# 3. Создать базу данных
 createdb page_analyzer
-psql -d page_analyzer -f database.sql
 
-# Запустить приложение
+# 4. Применить миграции
+psql -d $DATABASE_URL -f database.sql
+
+# 5. Запустить приложение в режиме разработки
 make dev
