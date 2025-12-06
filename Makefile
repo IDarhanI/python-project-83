@@ -15,6 +15,9 @@ render-start:
 build:
 	./build.sh
 
+setup:  # ⬅️ ДОБАВИТЬ ЭТУ КОМАНДУ (для Hexlet тестов)
+	uv sync
+
 lint:
 	uv run ruff check .
 
@@ -24,10 +27,10 @@ format:
 format-check:
 	uv run ruff format --check .
 
-fix:  # ДОБАВЛЯЕМ ЭТУ КОМАНДУ
+fix:
 	uv run ruff check --fix . && uv run ruff format .
 
 test:
 	uv run pytest tests/ -v
 
-.PHONY: install dev start render-start build lint format format-check fix test
+.PHONY: install dev start render-start build setup lint format format-check fix test
