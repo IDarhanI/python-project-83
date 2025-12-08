@@ -2,6 +2,7 @@
 
 [![Hexlet tests](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
+[![CI/CD Pipeline](https://github.com/IDarhanI/python-project-83/actions/workflows/ci.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/ci.yml)
 
 Веб-приложение для анализа веб-страниц на SEO-пригодность. Проверяет доступность страниц, извлекает ключевые метаданные и отслеживает изменения.
 
