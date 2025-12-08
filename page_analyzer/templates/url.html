@@ -60,20 +60,20 @@
                 <input type="submit" class="btn btn-primary" value="Запустить проверку">
             </form>
             
-            {% if checks %}
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover mt-2" data-test="checks">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Код ответа</th>
-                                <th>h1</th>
-                                <th>title</th>
-                                <th>description</th>
-                                <th>Дата создания</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-2" data-test="checks">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Код ответа</th>
+                            <th>h1</th>
+                            <th>title</th>
+                            <th>description</th>
+                            <th>Дата создания</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if checks %}
                             {% for check in checks %}
                                 <tr>
                                     <td>{{ check.id }}</td>
@@ -96,14 +96,14 @@
                                     <td>{{ check.created_at.strftime('%Y-%m-%d') if check.created_at }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="alert alert-info mt-3">
-                    Пока не выполнено ни одной проверки.
-                </div>
-            {% endif %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">Пока не выполнено ни одной проверки</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
