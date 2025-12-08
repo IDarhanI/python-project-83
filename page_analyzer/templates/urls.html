@@ -13,7 +13,8 @@
             <a class="navbar-brand" href="{{ url_for('index') }}">Анализатор страниц</a>
             <div id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('urls') }}">Сайты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('urls') }}">Сайты</a></li>
                 </ul>
             </div>
         </nav>
@@ -34,29 +35,48 @@
 
     <main class="flex-grow-1">
         <div class="container-lg mt-3">
-            <h1></h1>
+            <h1>Сайты</h1>
             
-            <div class="row">
-                <div class="col-12 col-md-10 col-lg-8 mx-auto border rounded-3 bg-light p-5">
-                    <h1 class="display-3">Анализатор страниц</h1>
-                    <p class="lead">Бесплатно проверяйте сайты на SEO-пригодность</p>
-                    <form action="{{ url_for('add_url') }}" method="post" class="d-flex justify-content-center">
-                        <label for="text" class="visually-hidden">Url для проверки</label>
-                        <input type="text" 
-                               name="url" 
-                               placeholder="https://www.example.com" 
-                               value="{{ url or '' }}" 
-                               class="form-control form-control-lg {% if error %}is-invalid{% endif %}" 
-                               required>
-                        <input type="submit" 
-                               class="btn btn-primary btn-lg ms-3 px-5 text-uppercase mx-3" 
-                               value="Проверить">
-                        {% if error %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endif %}
-                    </form>
+            {% if urls %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" data-test="urls">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Имя</th>
+                                <th>Последняя проверка</th>
+                                <th>Код ответа</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for url in urls %}
+                                <tr>
+                                    <td>{{ url.id }}</td>
+                                    <td>
+                                        <a href="{{ url_for('url_detail', id=url.id) }}">
+                                            {{ url.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if url.last_check_date %}
+                                            {{ url.last_check_date.strftime('%Y-%m-%d') }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if url.last_status_code %}
+                                            {{ url.last_status_code }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Пока не добавлено ни одного сайта.
+                </div>
+            {% endif %}
         </div>
     </main>
 

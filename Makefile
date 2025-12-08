@@ -33,4 +33,7 @@ fix:
 test:
 	uv run pytest tests/ -v
 
+migrate:
+	psql -a -d ${DATABASE_URL} -f database.sql
+
 .PHONY: install dev start render-start build setup lint format format-check fix test

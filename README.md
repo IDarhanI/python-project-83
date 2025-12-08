@@ -1,46 +1,46 @@
 # 🔍 Page Analyzer
 
-![Hexlet tests](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)
-![Build](https://github.com/IDarhanI/python-project-83/actions/workflows/build.yml/badge.svg)
-![Lint](https://github.com/IDarhanI/python-project-83/actions/workflows/lint.yaml/badge.svg)
-![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=alert_status)
-![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=sqale_rating)
+[![Hexlet tests](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml)
+[![Build](https://github.com/IDarhanI/python-project-83/actions/workflows/build.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/build.yml)
+[![Lint](https://github.com/IDarhanI/python-project-83/actions/workflows/lint.yaml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/lint.yaml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
 
 Веб-приложение для анализа веб-страниц на SEO-пригодность. Проверяет доступность страниц, извлекает ключевые метаданные и отслеживает изменения.
 
-## 🌐 Демо
 
-Приложение развернуто на Render: [https://python-project-83-4utz.onrender.com/](https://python-project-83-4utz.onrender.com/)
+🚀 **Приложение развернуто на Render:** [https://python-project-83-4utz.onrender.com/](https://python-project-83-4utz.onrender.com/)
 
-## ✨ Возможности
+## 📋 Функциональность
 
-- **Валидация URL** – проверка корректности и уникальности URL-адресов
-- **Проверка доступности** – анализ HTTP статус-кодов ответов
-- **SEO-анализ** – извлечение ключевых метаданных:
-  - Заголовок страницы (`<title>`)
-  - Основной заголовок (`<h1>`)
-  - Мета-описание (`<meta name="description">`)
-- **История проверок** – хранение и отображение результатов всех проверок
-- **Адаптивный интерфейс** – современный дизайн на Bootstrap 5
+### Основные возможности:
+- ✅ **Добавление сайтов** – введите URL для анализа
+- ✅ **SEO-анализ** – проверка ключевых метаданных страницы
+- ✅ **Мониторинг доступности** – отслеживание кодов ответа сервера
+- ✅ **История проверок** – просмотр всех предыдущих проверок
+- ✅ **Валидация URL** – проверка корректности введенных адресов
 
-## 🏗️ Архитектура
+### Что анализируется:
+- **Код ответа HTTP** – статус доступности страницы (200, 404, 500 и т.д.)
+- **Заголовок H1** – основной заголовок страницы
+- **Тег Title** – заголовок страницы для браузера и поисковых систем
+- **Мета-описание** – описание страницы для поисковых систем
 
-- **Backend**: Flask (Python)
-- **База данных**: PostgreSQL
-- **Frontend**: Jinja2, Bootstrap 5
-- **Анализ HTML**: BeautifulSoup4
-- **Валидация**: validators, requests
-- **CI/CD**: GitHub Actions, SonarQube
+## 🛠 Технологии
 
-## 📦 Установка и запуск
+## 🚀 Быстрый старт
 
-### Предварительные требования
-
-- Python 3.9+
-- PostgreSQL 12+
+### Предварительные требования:
+- Python 3.11 или выше
+- PostgreSQL 14+
 - Git
-- [uv](https://github.com/astral-sh/uv) (установится автоматически)
 
+### Локальная установка:
+
+1. **Клонируйте репозиторий:**
+```bash
+git clone https://github.com/IDarhanI/python-project-83.git
+cd python-project-83
 ### Локальная установка
 
 ```bash
