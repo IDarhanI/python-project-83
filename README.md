@@ -1,8 +1,6 @@
 # 🔍 Page Analyzer
 
 [![Hexlet tests](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/hexlet-check.yml)
-[![Build](https://github.com/IDarhanI/python-project-83/actions/workflows/build.yml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/build.yml)
-[![Lint](https://github.com/IDarhanI/python-project-83/actions/workflows/lint.yaml/badge.svg)](https://github.com/IDarhanI/python-project-83/actions/workflows/lint.yaml)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=IDarhanI_python-project-83&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=IDarhanI_python-project-83)
 
 Веб-приложение для анализа веб-страниц на SEO-пригодность. Проверяет доступность страниц, извлекает ключевые метаданные и отслеживает изменения.
