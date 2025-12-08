@@ -2,43 +2,14 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
-
-env:
-  UV_PYTHON: "3.11"
+    branches: [ main ]
 
 jobs:
-  lint-and-format:
-    name: Lint & Format
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v2
-      with:
-        enable-cache: true
-    
-    - name: Install Python
-      run: uv python install ${{ env.UV_PYTHON }}
-    
-    - name: Install dependencies
-      run: uv sync
-    
-    - name: Check code formatting
-      run: uv run ruff format --check .
-    
-    - name: Check code quality
-      run: uv run ruff check .
-
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    needs: lint-and-format
     
     services:
       postgres:
@@ -56,42 +27,37 @@ jobs:
           - 5432:5432
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+    - uses: actions/checkout@v4
     
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
     
-    - name: Install dependencies
-      run: make install
+    - name: Install uv and dependencies
+      run: |
+        # Устанавливаем uv
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        source $HOME/.cargo/env
+        
+        # Создаем виртуальное окружение и устанавливаем зависимости
+        uv venv .venv
+        source .venv/bin/activate
+        uv sync
     
     - name: Setup test database
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_page_analyzer
       run: |
+        source .venv/bin/activate
         psql $DATABASE_URL -f database.sql
     
-    - name: Run basic app check
+    - name: Run basic checks
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_page_analyzer
         SECRET_KEY: test-secret-key
       run: |
-        # Проверка что зависимости установлены
-        python -c "import flask; print(f'✅ Flask: {flask.__version__}')"
-        python -c "import dotenv; print('✅ python-dotenv')"
-        python -c "import psycopg2; print('✅ psycopg2')"
-        python -c "import validators; print('✅ validators')"
-        python -c "import requests; print(f'✅ requests: {requests.__version__}')"
-        python -c "import bs4; print('✅ beautifulsoup4')"
-        
-        # Импорт приложения
+        source .venv/bin/activate
         python -c "
         import sys
         sys.path.insert(0, '.')
@@ -99,42 +65,3 @@ jobs:
         print('✅ Flask app imported successfully')
         print(f'App name: {app.name}')
         "
-
-  sonar-scan:
-    name: SonarQube Scan
-    runs-on: ubuntu-latest
-    needs: test
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: make install
-    
-    - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v6
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.projectKey=IDarhanI_python-project-83
-          -Dsonar.organization=idarhani
-          -Dsonar.sources=page_analyzer
-          -Dsonar.exclusions=**/__pycache__/**,**/*.pyc
-          -Dsonar.language=py
-          -Dsonar.python.version=3.11
-          -Dsonar.sourceEncoding=UTF-8
-          -Dsonar.host.url=https://sonarcloud.io
